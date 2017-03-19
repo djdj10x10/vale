@@ -65,23 +65,22 @@ func DumpConfig() string {
 // initialPosition calculates the position of a match (given by the location in
 // the reference document, `loc`) in the source document (`ctx`).
 func initialPosition(ctx string, substring string, loc []int) int {
-	var pos int
 	if strings.Count(ctx, substring) > 1 {
 		// If there's more than one, we take the first bounded option.
 		// For example, given that we're looking for "very", "every" => nested
 		// and " very " => bounded.
 		subctx := ctx[loc[0]:]
 		pat := fmt.Sprintf(`(?:\b|_)%s(?:\b|_)`, regexp.QuoteMeta(substring))
-		loc := regexp.MustCompile(pat).FindStringIndex(subctx)
-		if len(loc) > 0 {
-			pos = loc[0]
+		sloc := regexp.MustCompile(pat).FindStringIndex(subctx)
+		if len(sloc) > 0 {
+			pos := sloc[0]
 			if strings.HasPrefix(ctx[pos:], "_") {
 				pos++ // We don't want to include the underscore boundary.
 			}
 			return pos + (len(ctx) - len(subctx)) + 1
 		}
 	}
-	return strings.Index(ctx, substring) + 1 // `pos` needs to be 1-indexed.
+	return strings.Index(ctx, substring) + 1
 }
 
 // FindLoc calculates the line and span of an Alert.
